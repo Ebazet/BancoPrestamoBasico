@@ -23,7 +23,7 @@ namespace BancoPrestamoBasico
             InitializeComponent();
             nombreCliente = nombre;
             string listadoCiudades = Properties.Resources.lugares.ToString();
-            lugaresDisponibles = listadoCiudades.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            lugaresDisponibles = listadoCiudades.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             interesesBase = new Dictionary<int, double>();
             int i;
@@ -34,39 +34,7 @@ namespace BancoPrestamoBasico
                 interesesBase[cuotas[i]] = intereses;
             }
         }
-
-        private void btn_confirmarSolicitud_Click(object sender, EventArgs e)
-        {
-            switch (validaciones())
-            {
-                case 0:
-                {
-                    errorProvider1.SetError(gbx_datosPersonales, "");
-                    errorProvider1.SetError(gbx_detaPrestamo, "");
-                    double interesMensual = calcularInteres();
-                    double montoPedido = double.Parse(txt_monto.Text);
-                    int cuotasPedidas = (int)cbx_cuotas.SelectedIndex;
-                    double interesesTotal = montoPedido * (interesMensual / 100) * cuotasPedidas;
-                    double montoPagar = montoPedido + interesesTotal;
-                    string mensaje = "Su préstamo por " + montoPedido + " en " + cuotasPedidas + " cuotas se consederá con un interés del " + interesMensual + "% mensual \nEl monto final ascienda a " + montoPagar;
-                    MessageBoxButtons  buttons = MessageBoxButtons.OK;
-                    MessageBox.Show(mensaje,"Cálculo de intereses",buttons);
-                    break;
-                }
-                case 1:
-                {
-                    errorProvider1.SetError(gbx_datosPersonales, "Completar todos los datos personales");
-                    errorProvider1.SetError(gbx_detaPrestamo, "");
-                    break;
-                }
-                case 2:
-                {
-                    errorProvider1.SetError(gbx_datosPersonales, "");
-                    errorProvider1.SetError(gbx_detaPrestamo, "Debe ingresar un monto númerico y una cantidad de cuotas");
-                    break;
-                }
-            }
-        }
+              
 
         private void fmr_prestamos_Load(object sender, EventArgs e)
         {
@@ -132,7 +100,7 @@ namespace BancoPrestamoBasico
             }
             else
             {
-                if (!(txt_monto.Text.All(char.IsDigit)) || (txt_monto.Text = "") || (cbx_cuotas.SelectedIndex > -1))
+                if (!(txt_monto.Text.All(char.IsDigit)) || (txt_monto.Text == "") || (cbx_cuotas.SelectedIndex <= -1))
                 {
                     return 2;
                 }
@@ -142,7 +110,40 @@ namespace BancoPrestamoBasico
                 }
             }
         }
-            
+
+        private void btn_confirmarSolicitud_Click(object sender, EventArgs e)
+        {
+            switch (validaciones())
+            {
+                case 0:
+                    {
+                        errorProvider1.SetError(gbx_datosPersonales, "");
+                        errorProvider1.SetError(gbx_detaPrestamo, "");
+                        double interesMensual = calcularInteres();
+                        double montoPedido = double.Parse(txt_monto.Text);
+                        int cuotasPedidas = (int)cbx_cuotas.SelectedItem;
+                        double interesesTotal = montoPedido * (interesMensual / 100) * cuotasPedidas;
+                        double montoPagar = montoPedido + interesesTotal;
+                        string mensaje = "Su préstamo por " + montoPedido + " en " + cuotasPedidas + " cuotas se consederá con un interés del " + interesMensual + "% mensual \nEl monto final ascienda a " + montoPagar;
+                        MessageBoxButtons buttons = MessageBoxButtons.OK;
+                        MessageBox.Show(mensaje, "Cálculo de intereses", buttons);
+                        break;
+                    }
+                case 1:
+                    {
+                        errorProvider1.SetError(gbx_datosPersonales, "Completar todos los datos personales");
+                        errorProvider1.SetError(gbx_detaPrestamo, "");
+                        break;
+                    }
+                case 2:
+                    {
+                        errorProvider1.SetError(gbx_datosPersonales, "");
+                        errorProvider1.SetError(gbx_detaPrestamo, "Debe ingresar un monto númerico y una cantidad de cuotas");
+                        break;
+                    }
+            }
+        }
+
 
     }
 }
